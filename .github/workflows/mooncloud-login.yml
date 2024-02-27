@@ -1,0 +1,31 @@
+name: Moon Cloud Login CI Template
+
+on:
+  workflow_call:
+    inputs:
+      mooncloud_api_login_endpoint:
+        required: false
+        type: string
+        default: 'https://api.v2.moon-cloud.eu/user/login-token/'
+    secrets:
+      mooncloud_username:
+        required: true
+      mooncloud_password:
+        required: true
+    outputs:
+      mooncloud_token:
+        value: ${{ jobs.mooncloud_login.outputs.mooncloud_token }}
+
+
+jobs:
+  mooncloud_login:
+    runs-on: ubuntu-latest
+    outputs:
+      mooncloud_token: ${{ steps.mooncloud_login.outputs.mooncloud_token }}
+    steps:
+      - run: sudo apt-get update && sudo apt-get install -y curl jq
+      - id: mooncloud_login
+        run: >
+          echo "MOONCLOUD_TOKEN=$(curl --header "Content-Type: application/json" 
+          --request POST 
+          --data "{\"username\":\"${{secrets.mooncloud_username}}\",\"password\":\"$(echo '${{secrets.mooncloud_password}}' | sed 's/\\$/\\\\$/g')\"}" ${{inputs.mooncloud_api_login_endpoint}} | jq '.token' | tr -d '"' | base64 -w 0 )" >> $GITHUB_OUTPUT

@@ -1,0 +1,28 @@
+name: Moon Cloud Evaluation CI Template
+
+on:
+  workflow_call:
+    inputs:
+      mooncloud_uer_id:
+        required: true
+        type: number
+      mooncloud_api_uer_endpoint_prefix:
+        required: false
+        type: string
+        default: "https://api.v2.moon-cloud.eu/evaluation-rules/"
+      mooncloud_api_uer_endpoint_suffix:
+        required: false
+        type: string
+        default: "/start/"
+    secrets:
+      mooncloud_token:
+        required: true
+
+jobs:
+  mooncloud_evaluation:
+    runs-on: ubuntu-latest
+    steps:
+      - run: sudo apt-get update && sudo apt-get install -y curl
+      - run: >
+          curl --header "Content-Type: application/json" --header "Authorization: Token $(echo -n ${{secrets.mooncloud_token}} | base64 --decode)"
+          --request PUT ${{inputs.mooncloud_api_uer_endpoint_prefix}}${{inputs.mooncloud_uer_id}}${{inputs.mooncloud_api_uer_endpoint_suffix}}
