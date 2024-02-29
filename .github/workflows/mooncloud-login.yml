@@ -23,7 +23,13 @@ jobs:
     outputs:
       mooncloud_token: ${{ steps.mooncloud_login.outputs.mooncloud_token }}
     steps:
-      - run: sudo apt-get update && sudo apt-get install -y curl jq
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.6' 
+      - run: sudo apt-get update && sudo apt-get install -y curl
+      - run: pip install requests
+      - run: curl "https://repository.v2.moon-cloud.eu/alexdellabruna/gitlab-ci-injection/-/raw/master/mooncloud_utils.py" -O
+      - run: chmod u+x mooncloud_utils.py
       - id: mooncloud_login
         run: >
           echo "MOONCLOUD_TOKEN=$(curl --header "Content-Type: application/json" 
