@@ -6,14 +6,10 @@ on:
       mooncloud_uer_id:
         required: true
         type: number
-      mooncloud_api_uer_endpoint_prefix:
+      mooncloud_wait_result:
         required: false
         type: string
-        default: "https://api.v2.moon-cloud.eu/evaluation-rules/"
-      mooncloud_api_uer_endpoint_suffix:
-        required: false
-        type: string
-        default: "/start/"
+        default: "false"
     secrets:
       mooncloud_token:
         required: true
@@ -22,7 +18,16 @@ jobs:
   mooncloud_evaluation:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.6' 
       - run: sudo apt-get update && sudo apt-get install -y curl
+      - run: pip install requests
+      - run: curl "https://raw.githubusercontent.com/SESARLab/Moon-Cloud-CI-Injection/main/mooncloud_utils.py" -O
+      - run: chmod u+x mooncloud_utils.py
       - run: >
-          curl --header "Content-Type: application/json" --header "Authorization: Token $(echo -n ${{secrets.mooncloud_token}} | base64 --decode)"
-          --request PUT ${{inputs.mooncloud_api_uer_endpoint_prefix}}${{inputs.mooncloud_uer_id}}${{inputs.mooncloud_api_uer_endpoint_suffix}}
+          if [ "${{inputs.mooncloud_wait_result}}" == "true" ]; then
+            ./mooncloud_utils.py start-evaluation --token $(echo -n ${{secrets.mooncloud_token}} | base64 --decode) --uer-id ${{inputs.mooncloud_uer_id}} --wait-result
+          else
+            ./mooncloud_utils.py start-evaluation --token $(echo -n ${{secrets.mooncloud_token}} | base64 --decode) --uer-id ${{inputs.mooncloud_uer_id}}
+          fi
