@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import math
 import sys
 import time
 import requests
@@ -36,12 +37,13 @@ class MoonCloudUtils:
             tmp_result=None
             t_counter=0
             while not new_result_flag and t_counter<MoonCloudUtils.max_attempt_number:
+                print("Waiting for evaluation completion...")
+                time.sleep(10)
                 tmp_result,tmp_result_number=MoonCloudUtils.getEvaluationResult(token=token,uer_id=uer_id)
                 if tmp_result_number==(initial_result_number+1):
                     new_result_flag=True
-                print("Waiting for evaluation completion...")
-                time.sleep(10)
-                t_counter=t_counter+1
+                else:
+                    t_counter=t_counter+1
             if t_counter>=MoonCloudUtils.max_attempt_number:
                 raise TimeoutError("Max attempt number exceeded")
             execution_result={
@@ -61,7 +63,12 @@ class MoonCloudUtils:
             "Authorization":"Token "+token})
         response.raise_for_status()
         response_obj=response.json()
-        return response_obj,len(response_obj["tests"][0]["execution_results"])
+        tests_ex_res_len_sum=0
+        tests_ex_res_len_avg=0
+        for test in response_obj["tests"]:
+            tests_ex_res_len_sum=tests_ex_res_len_sum+len(test["execution_results"])
+        tests_ex_res_len_avg=math.floor(tests_ex_res_len_sum/len(response_obj["tests"]))
+        return response_obj,tests_ex_res_len_avg
 
 def exitWithError(error_str):
     print("Error occured: "+error_str, file=sys.stderr)
