@@ -25,7 +25,8 @@ jobs:
       - run: pip install requests
       - run: curl "https://raw.githubusercontent.com/SESARLab/Moon-Cloud-CI-Injection/main/mooncloud_utils.py" -O
       - run: chmod u+x mooncloud_utils.py
-      - run: MOONCLOUD_TOKEN=$(./mooncloud_utils.py get-token --username ${{secrets.mooncloud_username}} --password $(echo '${{secrets.mooncloud_password}}' | sed 's/\\$/\\\\$/g'))
       - id: mooncloud_login
-        run: if [ -z "$MOONCLOUD_TOKEN" ]; then exit 1; else echo "MOONCLOUD_TOKEN=$(echo '$MOONCLOUD_TOKEN' | base64 -w 0 )" >> $GITHUB_OUTPUT; fi
+        run: |
+             MOONCLOUD_TOKEN=$(./mooncloud_utils.py get-token --username ${{secrets.mooncloud_username}} --password $(echo '${{secrets.mooncloud_password}}' | sed 's/\\$/\\\\$/g'))
+             if [ -z "$MOONCLOUD_TOKEN" ]; then exit 1; else echo "MOONCLOUD_TOKEN=$(echo '$MOONCLOUD_TOKEN' | base64 -w 0 )" >> $GITHUB_OUTPUT; fi
           
