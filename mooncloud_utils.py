@@ -6,9 +6,9 @@ import requests
 import argparse
 
 class MoonCloudUtils:
-    mooncloud_api_login_endpoint="https://api.v2.moon-cloud.eu/user/login-token/"
-    mooncloud_api_evaluation_start_endpoint="https://api.v2.moon-cloud.eu/evaluation-rules/{uer_id}/start/"
-    mooncloud_api_evaluation_endpoint="https://api.v2.moon-cloud.eu/evaluation-rules/{uer_id}/"
+    mooncloud_api_login_endpoint="https://api.moon-cloud.ricerca.sesar.di.unimi.it/user/login-token/"
+    mooncloud_api_evaluation_start_endpoint="https://api.moon-cloud.ricerca.sesar.di.unimi.it/evaluation-rules/{uer_id}/start/"
+    mooncloud_api_evaluation_endpoint="https://api.moon-cloud.ricerca.sesar.di.unimi.it/evaluation-rules/{uer_id}/"
     max_attempt_number=10
 
     @staticmethod
